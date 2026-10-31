@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hogwarts Letter Greeting</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      background: radial-gradient(circle at center, #2b3036 0%, #111418 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      color: #e5e5e5;
+      overflow: hidden;
+    }
+
+    /* Efek Bintang/Magis di Background */
+    .stars {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: transparent url('https://www.transparenttextures.com/patterns/stardust.png') repeat;
+      opacity: 0.3;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Area Amplop */
+    .envelope-wrapper {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    
+    .envelope-wrapper:hover {
+      transform: translateY(-10px);
+    }
+
+    .envelope {
+      width: 320px;
+      height: 220px;
+      background: #dfc8a5;
+      position: relative;
+      border-radius: 4px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Lipatan Amplop (Flaps) */
+    .envelope::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 0; height: 0;
+      border-left: 160px solid transparent;
+      border-right: 160px solid transparent;
+      border-top: 130px solid #d4b88c;
+      z-index: 1;
+      filter: drop-shadow(0 3px 3px rgba(0,0,0,0.1));
+    }
+    .envelope::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 0; height: 0;
+      border-left: 160px solid #ceb082;
+      border-right: 160px solid #ceb082;
+      border-bottom: 110px solid #c9a978;
+      z-index: 0;
+    }
+
+    /* Segel Lilin Merah */
+    .wax-seal {
+      position: relative;
+      z-index: 2;
+      width: 65px;
+      height: 65px;
+      background: radial-gradient(circle, #a11425 40%, #720815 100%);
+      border-radius: 50%;
+      border: 2px solid #57050f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #e5b95c;
+      font-family: 'Cinzel', serif;
+      font-size: 32px;
+      font-weight: bold;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.5), inset 0 2px 5px rgba(255,255,255,0.2);
+      transition: all 0.3s ease;
+    }
+
+    .envelope-wrapper:hover .wax-seal {
+      transform: scale(1.1) rotate(5deg);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.7), inset 0 2px 5px rgba(255,255,255,0.3);
+    }
+
+    .hint {
+      margin-top: 25px;
+      font-family: 'Cinzel', serif;
+      letter-spacing: 2px;
+      font-size: 14px;
+      color: #c9a978;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+
+    /* Kertas Surat (Parchment) */
+    .letter-modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+      padding: 20px;
+    }
+    
+    .letter-modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .letter-content {
+      background: #f4e8d1;
+      width: 100%;
+      max-width: 550px;
+      padding: 50px 40px;
+      border-radius: 2px;
+      position: relative;
+      transform: scale(0.9) translateY(20px);
+      transition: transform 0.5s ease;
+      color: #2c3e2f; /* Hijau gelap khas tinta zamrud */
+      box-shadow: inset 0 0 60px rgba(139, 94, 60, 0.3), 0 15px 50px rgba(0,0,0,0.7);
+      background-image: radial-gradient(circle, transparent 70%, rgba(139, 94, 60, 0.1) 100%);
+    }
+
+    .letter-modal.active .letter-content {
+      transform: scale(1) translateY(0);
+    }
+
+    /* Tipografi Isi Surat */
+    .hogwarts-crest {
+      text-align: center;
+      font-family: 'Cinzel', serif;
+      margin-bottom: 30px;
+      border-bottom: 2px solid #2c3e2f;
+      padding-bottom: 15px;
+    }
+    
+    .hogwarts-crest h1 {
+      font-size: 28px;
+      letter-spacing: 3px;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+    
+    .hogwarts-crest h2 {
+      font-size: 14px;
+      letter-spacing: 1px;
+      font-weight: 600;
+      color: #4a4a4a;
+    }
+
+    .letter-body {
+      font-size: 17px;
+      line-height: 1.6;
+      color: #1a1a1a;
+    }
+    
+    .letter-body p {
+      margin-bottom: 15px;
+    }
+
+    .signature {
+      margin-top: 40px;
+      font-style: italic;
+      font-weight: 700;
+      font-size: 20px;
+    }
+
+    .title {
+      font-size: 14px;
+      font-style: normal;
+      font-family: 'Cinzel', serif;
+      color: #4a4a4a;
+    }
+
+    /* Tombol Tutup */
+    .close-btn {
+      position: absolute;
+      top: 15px; right: 20px;
+      background: none;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      color: #5c3b1e;
+      transition: color 0.2s;
+    }
+    
+    .close-btn:hover {
+      color: #a11425;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="stars"></div>
+
+  <!-- Area Amplop Tertutup -->
+  <div class="envelope-wrapper" id="envelopeBtn">
+    <div class="envelope">
+      <div class="wax-seal">H</div>
+    </div>
+    <p class="hint">Break the seal to open</p>
+  </div>
+
+  <!-- Area Surat Terbuka -->
+  <div class="letter-modal" id="letterModal">
+    <div class="letter-content">
+      <button class="close-btn" id="closeBtn">&times;</button>
+      
+      <div class="hogwarts-crest">
+        <h1>HOGWARTS</h1>
+        <h2>SCHOOL OF WITCHCRAFT AND WIZARDRY</h2>
+      </div>
+
+      <div class="letter-body">
+        <p>Dear <strong>Ms. Ebi</strong>,</p>
+        
+        <p>We are dispatching this owl with an urgent inquiry regarding tonight’s schedule.</p>
+        
+        <p>Would it be alright if I gave you a call at 9:00 PM? There are a few things—and perhaps a bit of magic—I would love to catch up on with you.</p>
+        
+        <p>We await your owl by return post with your response.</p>
+        
+        <div class="signature">
+          Minerva McGonagall<br>
+          <span class="title">Deputy Headmistress</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const envelopeBtn = document.getElementById('envelopeBtn');
+    const letterModal = document.getElementById('letterModal');
+    const closeBtn = document.getElementById('closeBtn');
+
+    // Fungsi membuka surat
+    envelopeBtn.addEventListener('click', () => {
+      letterModal.classList.add('active');
+    });
+
+    // Fungsi menutup surat via tombol X
+    closeBtn.addEventListener('click', () => {
+      letterModal.classList.remove('active');
+    });
+
+    // Fungsi menutup surat jika area gelap di luar kertas diklik
+    letterModal.addEventListener('click', (e) => {
+      if (e.target === letterModal) {
+        letterModal.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>
